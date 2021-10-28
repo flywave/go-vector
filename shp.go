@@ -16,10 +16,43 @@ const (
 	SHAPE_DBF_EXT = ".dbf"
 )
 
+type shapeIterator struct {
+	file        *shp.ShapeFile
+	currentFeat int
+}
+
+func newIterator(path string) *shapeIterator {
+	return &shapeIterator{file: shp.Open(path), currentFeat: 0}
+}
+
+func (p *shapeIterator) next() bool {
+	if p.file == nil || p.file.ShapeCount == 0 {
+		return false
+	}
+	if p.currentFeat < (p.file.ShapeCount - 1) {
+		p.currentFeat++
+		return true
+	}
+	return false
+}
+
+func (p *shapeIterator) readFeature() *geom.Feature {
+	i := p.currentFeat
+
+	return p.file.Feature(i)
+}
+
+func (p *shapeIterator) Close() error {
+	p.file.Close()
+	return nil
+}
+
 type ShapeProvider struct {
 	archiver *Archiver
 	shpfiles []string
-	current  *shp.ShapeFile
+	workDir  string
+	index    int
+	current  *shapeIterator
 }
 
 func (p *ShapeProvider) ShapeFiles() []string {
@@ -104,10 +137,37 @@ func (p *ShapeProvider) Close() error {
 	return p.archiver.Close()
 }
 
-func (p *ShapeProvider) HasNext() bool {
+func (p *ShapeProvider) moveNext() bool {
+	if len(p.shpfiles) == 0 {
+		return false
+	}
+	if p.index < len(p.shpfiles)-1 {
+		p.index++
+		filename := p.shpfiles[p.index]
+		filename = path.Join(p.workDir, filename)
+		if p.current != nil {
+			p.current.Close()
+		}
+		p.current = newIterator(filename)
+		return true
+	}
 	return false
 }
 
-func (p *ShapeProvider) NextFeature() *geom.Feature {
+func (p *ShapeProvider) Next() bool {
+	if p.current != nil {
+		if p.current.next() {
+			return true
+		} else {
+			return p.moveNext()
+		}
+	}
+	return false
+}
+
+func (p *ShapeProvider) Read() *geom.Feature {
+	if p.current != nil {
+		return p.current.readFeature()
+	}
 	return nil
 }

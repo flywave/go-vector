@@ -4,10 +4,11 @@ import (
 	"io"
 
 	"github.com/flywave/go-geom"
-	_ "github.com/flywave/go-gpx"
+	"github.com/flywave/go-gpx"
 )
 
 type GPXProvider struct {
+	gpx *gpx.GPX
 }
 
 func (p *GPXProvider) Open(filename string, file io.Reader) error {
@@ -22,10 +23,10 @@ func (p *GPXProvider) Close() error {
 	return nil
 }
 
-func (p *GPXProvider) HasNext() bool {
+func (p *GPXProvider) Next() bool {
 	return false
 }
 
-func (p *GPXProvider) NextFeature() *geom.Feature {
+func (p *GPXProvider) Read() *geom.Feature {
 	return nil
 }

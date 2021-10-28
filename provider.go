@@ -10,6 +10,6 @@ type Provider interface {
 	Match(filename string, file io.Reader) bool
 	Open(filename string, file io.Reader) error
 	Close() error
-	HasNext() bool
-	NextFeature() *geom.Feature
+	Next() bool
+	Read() *geom.Feature
 }

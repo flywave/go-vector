@@ -3,11 +3,12 @@ package govector
 import (
 	"io"
 
-	_ "github.com/flywave/go-geocsv"
+	"github.com/flywave/go-geocsv"
 	"github.com/flywave/go-geom"
 )
 
 type GeoCSVProvider struct {
+	csv *geocsv.GeoCSV
 }
 
 func (p *GeoCSVProvider) Open(filename string, file io.Reader) error {
@@ -22,10 +23,10 @@ func (p *GeoCSVProvider) Close() error {
 	return nil
 }
 
-func (p *GeoCSVProvider) HasNext() bool {
+func (p *GeoCSVProvider) Next() bool {
 	return false
 }
 
-func (p *GeoCSVProvider) NextFeature() *geom.Feature {
+func (p *GeoCSVProvider) Read() *geom.Feature {
 	return nil
 }

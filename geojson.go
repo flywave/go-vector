@@ -8,6 +8,7 @@ import (
 )
 
 type GeoJSONProvider struct {
+	fc *geom.FeatureCollection
 }
 
 func (p *GeoJSONProvider) Open(filename string, file io.Reader) error {
@@ -22,10 +23,10 @@ func (p *GeoJSONProvider) Close() error {
 	return nil
 }
 
-func (p *GeoJSONProvider) HasNext() bool {
+func (p *GeoJSONProvider) Next() bool {
 	return false
 }
 
-func (p *GeoJSONProvider) NextFeature() *geom.Feature {
+func (p *GeoJSONProvider) Read() *geom.Feature {
 	return nil
 }

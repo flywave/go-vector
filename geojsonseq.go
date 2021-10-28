@@ -3,6 +3,7 @@ package govector
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"io"
 
 	"github.com/flywave/go-geom"
@@ -17,7 +18,7 @@ type chunk struct {
 	err        error
 }
 
-func (ch *chunk) Next() bool {
+func (ch *chunk) next() bool {
 	if ch.endReached {
 		return false
 	}
@@ -33,17 +34,19 @@ func (ch *chunk) Next() bool {
 	return true
 }
 
-func (ch *chunk) Scan(fc *geom.FeatureCollection) error {
+func (ch *chunk) read() (*geom.Feature, error) {
 	if ch.err != nil {
-		return ch.err
+		return nil, ch.err
 	}
 	var fts []*geom.Feature
 	err := json.Unmarshal(append(append([]byte(`[`), ch.buf...), ']'), &fts)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	fc.Features = append(fc.Features, fts...)
-	return nil
+	if len(fts) == 0 || len(fts) > 1 {
+		return nil, errors.New("geojson format error")
+	}
+	return fts[0], nil
 }
 
 type GeoJSONGSeqProvider struct {
@@ -61,10 +64,10 @@ func (p *GeoJSONGSeqProvider) Close() error {
 	return nil
 }
 
-func (p *GeoJSONGSeqProvider) HasNext() bool {
+func (p *GeoJSONGSeqProvider) Next() bool {
 	return false
 }
 
-func (p *GeoJSONGSeqProvider) NextFeature() *geom.Feature {
+func (p *GeoJSONGSeqProvider) Read() *geom.Feature {
 	return nil
 }

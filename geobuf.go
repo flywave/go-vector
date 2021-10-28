@@ -3,11 +3,12 @@ package govector
 import (
 	"io"
 
-	_ "github.com/flywave/go-geobuf"
+	"github.com/flywave/go-geobuf"
 	"github.com/flywave/go-geom"
 )
 
 type GeoBufProvider struct {
+	reader *geobuf.Reader
 }
 
 func (p *GeoBufProvider) Open(filename string, file io.Reader) error {
@@ -22,10 +23,10 @@ func (p *GeoBufProvider) Close() error {
 	return nil
 }
 
-func (p *GeoBufProvider) HasNext() bool {
+func (p *GeoBufProvider) Next() bool {
 	return false
 }
 
-func (p *GeoBufProvider) NextFeature() *geom.Feature {
+func (p *GeoBufProvider) Read() *geom.Feature {
 	return nil
 }

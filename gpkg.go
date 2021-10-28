@@ -4,10 +4,11 @@ import (
 	"io"
 
 	"github.com/flywave/go-geom"
-	_ "github.com/flywave/go-gpkg"
+	"github.com/flywave/go-gpkg"
 )
 
 type GeoPackageProvider struct {
+	db *gpkg.GeoPackage
 }
 
 func (p *GeoPackageProvider) Open(filename string, file io.Reader) error {
@@ -22,10 +23,10 @@ func (p *GeoPackageProvider) Close() error {
 	return nil
 }
 
-func (p *GeoPackageProvider) HasNext() bool {
+func (p *GeoPackageProvider) Next() bool {
 	return false
 }
 
-func (p *GeoPackageProvider) NextFeature() *geom.Feature {
+func (p *GeoPackageProvider) Read() *geom.Feature {
 	return nil
 }
