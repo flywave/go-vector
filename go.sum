@@ -31,8 +31,8 @@ github.com/flywave/go-geo v0.0.0-20211015074126-1d829acc3378 h1:JAXax0JqCGjZNAIN
 github.com/flywave/go-geo v0.0.0-20211015074126-1d829acc3378/go.mod h1:89ynpGeuN8scP8bsxzKcL73hSHIF7OsEEWrkKGq+6Yk=
 github.com/flywave/go-geobuf v0.0.0-20210806074545-36204a4cab4a h1:RUUEfTMNNz2xAKUXzme5godyLrr+DQI4yqtPFmhJJ4Y=
 github.com/flywave/go-geobuf v0.0.0-20210806074545-36204a4cab4a/go.mod h1:/pcWHGH0NH9+i3az0bzGDSHpTaf+SdybspR28tYBQjE=
-github.com/flywave/go-geocsv v0.0.0-20210710132018-a39fa4e114bc h1:FpKGVFoBo4urs/tayJ1MCmwCixyUbMvM+RznPo/YZhM=
-github.com/flywave/go-geocsv v0.0.0-20210710132018-a39fa4e114bc/go.mod h1:bs95GDwPoV2YNhlhzNauGB8wxrmeYtfg2VVe1xzLp44=
+github.com/flywave/go-geocsv v0.0.0-20211029010109-c398bac6ad05 h1:YN71Mug8+Jtb0kRX+tU3epGSw6jn16L4QB4A21oEVa0=
+github.com/flywave/go-geocsv v0.0.0-20211029010109-c398bac6ad05/go.mod h1:bs95GDwPoV2YNhlhzNauGB8wxrmeYtfg2VVe1xzLp44=
 github.com/flywave/go-geoid v0.0.0-20210705014121-cd8f70cb88bb h1:cfvIpGcu887EYg+ydfMj+hWSHHjxBBu066XK2+rKAQc=
 github.com/flywave/go-geoid v0.0.0-20210705014121-cd8f70cb88bb/go.mod h1:ndXH2J5+CsynPtyL7oihZtN8rRxJ8kpqqwy2DOa86OQ=
 github.com/flywave/go-geom v0.0.0-20210526012220-be9d5453d578/go.mod h1:whIEyVfpaBVcYiDCnnc4IJg5CI5KpLC3quy95YJ1W9I=
@@ -49,10 +49,10 @@ github.com/flywave/go-geos v0.0.0-20210924031454-d16b758e2026 h1:ccxFo1tlib18fLX
 github.com/flywave/go-geos v0.0.0-20210924031454-d16b758e2026/go.mod h1:5nZRI3ua5qOepZ7Vd8uTWjIRI8hIMWoxdDVU7rH26RQ=
 github.com/flywave/go-geotiff v0.0.0-20210730100939-aadf13b7cc54/go.mod h1:EJFPW3SUG56OqOQ9fyEJHf+N9Svpcv1sHb2WV/Gno5c=
 github.com/flywave/go-geotiff v0.0.0-20210812062209-a5754fcc5680/go.mod h1:EJFPW3SUG56OqOQ9fyEJHf+N9Svpcv1sHb2WV/Gno5c=
-github.com/flywave/go-gpkg v0.0.0-20211025141717-f1f0471c5c24 h1:V/KrD8qDk5xXBfyrDg/1niWPo4InCKCDDIep1s9Qqlg=
-github.com/flywave/go-gpkg v0.0.0-20211025141717-f1f0471c5c24/go.mod h1:s/izX5ZVzlg1jjTrUgWpGA8y4HhrElzMlfzCB38ZZGU=
-github.com/flywave/go-gpx v1.2.2-0.20211027141055-7fa376dde073 h1:KCBVl4L/mMSifZngABssSfVHYGic5mxCFqPV0Eek5aY=
-github.com/flywave/go-gpx v1.2.2-0.20211027141055-7fa376dde073/go.mod h1:99GDcGrSIKJFM7Zd7yHsZP8OOP0X0s36yQmviMAOBl4=
+github.com/flywave/go-gpkg v0.0.0-20211025142153-9080404ca13b h1:DIlxdNXXFzmmMQSZSEVaqvhy+GmfXQQgNgTK+1sR6uw=
+github.com/flywave/go-gpkg v0.0.0-20211025142153-9080404ca13b/go.mod h1:9xfNQesBeK4jew/ZMg6aeqODc4eKKtsDwMvml60YBuo=
+github.com/flywave/go-gpkg v0.0.0-20211029020113-5771f17ecfc6 h1:euZ0VaOyd4m6h6pS/rTK2ZiHv3ZvQyL2iKenD9pYWJI=
+github.com/flywave/go-gpkg v0.0.0-20211029020113-5771f17ecfc6/go.mod h1:9xfNQesBeK4jew/ZMg6aeqODc4eKKtsDwMvml60YBuo=
 github.com/flywave/go-lerc v0.0.0-20210724083528-61c70a1b0bc9/go.mod h1:ViGRrCXmuOf68/rpxR2fHy9nKOxdCKgCFd5+/iyWRTs=
 github.com/flywave/go-mapbox v0.0.0-20210526050552-b747a21e8c73/go.mod h1:JhsGa7N/RiwDj+cb0iT2uqu0ABSoCfX3MWSUcI9FbRY=
 github.com/flywave/go-mapbox v0.0.0-20210628094840-fec8338aa4dc/go.mod h1:8AOu8a0CMT+yZVwI9+e2mHmGxSMejPSaf3sGIJMOoyc=
@@ -215,10 +215,7 @@ golang.org/x/net v0.0.0-20200226121028-0de0cce0169b/go.mod h1:z5CRVTTTmAJ677TzLL
 golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e/go.mod h1:qpuaurCH72eLCgpAm/N6yyVIVM9cpaDIP3A8BGJEC5A=
 golang.org/x/net v0.0.0-20201021035429-f5854403a974/go.mod h1:sp8m0HH+o8qH0wwXwYZr8TS3Oi6o0r6Gce1SSxlDquU=
 golang.org/x/net v0.0.0-20210226172049-e18ecbb05110/go.mod h1:m0MpNAwzfU5UDzcl9v0D8zg8gWTRqZa9RBIspLL5mdg=
-golang.org/x/net v0.0.0-20210410081132-afb366fc7cd1/go.mod h1:9tjilg8BloeKEkVJvy7fQ90B1CfIiPueXVOjqfkSzI8=
 golang.org/x/net v0.0.0-20210813160813-60bc85c4be6d/go.mod h1:9nx3DQGgdP8bBQD5qxJ1jj9UTztislL4KSBs9R2vV5Y=
-golang.org/x/net v0.0.0-20211020060615-d418f374d309 h1:A0lJIi+hcTR6aajJH4YqKWwohY4aW9RO7oRMcdv+HKI=
-golang.org/x/net v0.0.0-20211020060615-d418f374d309/go.mod h1:9nx3DQGgdP8bBQD5qxJ1jj9UTztislL4KSBs9R2vV5Y=
 golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20190423024810-112230192c58/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
@@ -230,7 +227,6 @@ golang.org/x/sys v0.0.0-20190422165155-953cdadca894/go.mod h1:h1NjWce9XRLGQEsW7w
 golang.org/x/sys v0.0.0-20200323222414-85ca7c5b95cd/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200930185726-fdedc70b468f/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20201119102817-f84b799fce68/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
-golang.org/x/sys v0.0.0-20210330210617-4fbd30eecc44/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20210423082822-04245dca01da/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20210823070655-63515b42dcdf/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=

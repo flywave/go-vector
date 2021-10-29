@@ -1,6 +1,7 @@
 package govector
 
 import (
+	"errors"
 	"io"
 	"path"
 	"path/filepath"
@@ -38,7 +39,6 @@ func (p *shapeIterator) next() bool {
 
 func (p *shapeIterator) readFeature() *geom.Feature {
 	i := p.currentFeat
-
 	return p.file.Feature(i)
 }
 
@@ -128,6 +128,17 @@ func (p *ShapeProvider) Match(filename string, file io.Reader) bool {
 	}
 
 	return true
+}
+
+func (p *ShapeProvider) Reset() error {
+	if p.current != nil {
+		p.current.Close()
+	}
+	p.current = nil
+	if p.moveNext() {
+		return nil
+	}
+	return errors.New("reset error")
 }
 
 func (p *ShapeProvider) Close() error {

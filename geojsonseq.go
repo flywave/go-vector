@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"path/filepath"
 
 	"github.com/flywave/go-geom"
 )
@@ -16,6 +17,14 @@ type chunk struct {
 	reader     *bufio.Reader
 	buf        []byte
 	err        error
+}
+
+func newChunk(rd io.Reader) *chunk {
+	return &chunk{endReached: false, reader: bufio.NewReader(rd), buf: nil, err: nil}
+}
+
+func (ch *chunk) reset(r io.Reader) {
+	ch.reader.Reset(r)
 }
 
 func (ch *chunk) next() bool {
@@ -50,14 +59,41 @@ func (ch *chunk) read() (*geom.Feature, error) {
 }
 
 type GeoJSONGSeqProvider struct {
+	chunk *chunk
+	file  io.Reader
 }
 
 func (p *GeoJSONGSeqProvider) Open(filename string, file io.Reader) error {
+	p.file = file
+	p.chunk = newChunk(file)
 	return nil
 }
 
 func (p *GeoJSONGSeqProvider) Match(filename string, file io.Reader) bool {
-	return false
+	ext := filepath.Ext(filename)
+	if ext != ".geojson" {
+		return false
+	}
+	buffer := bufio.NewReader(file)
+
+	buf, err := buffer.ReadBytes(resourceSep)
+	if err != nil {
+		return false
+	}
+	var fts []*geom.Feature
+	err = json.Unmarshal(append(append([]byte(`[`), buf...), ']'), &fts)
+	if err != nil {
+		return false
+	}
+	if len(fts) == 0 || len(fts) > 1 {
+		return false
+	}
+	return true
+}
+
+func (p *GeoJSONGSeqProvider) Reset() error {
+	p.chunk.reset(p.file)
+	return nil
 }
 
 func (p *GeoJSONGSeqProvider) Close() error {
@@ -65,9 +101,16 @@ func (p *GeoJSONGSeqProvider) Close() error {
 }
 
 func (p *GeoJSONGSeqProvider) Next() bool {
+	if p.chunk != nil {
+		return p.chunk.next()
+	}
 	return false
 }
 
 func (p *GeoJSONGSeqProvider) Read() *geom.Feature {
-	return nil
+	feat, err := p.chunk.read()
+	if err != nil {
+		return nil
+	}
+	return feat
 }
