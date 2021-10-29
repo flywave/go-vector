@@ -3,6 +3,7 @@ package govector
 import (
 	"io"
 	"path/filepath"
+	"strings"
 
 	"github.com/flywave/go-geom"
 )
@@ -20,8 +21,10 @@ func NewExporter(filename string, writer io.WriteCloser) Exporter {
 	case ".geobuf":
 		return newGeoBufExporter(writer)
 	case ".gz":
-		return newGeoJSONGZExporter(writer)
-	case ".geojson":
+		if strings.HasSuffix(filename, ".geojson.gz") || strings.HasSuffix(filename, ".json.gz") {
+			return newGeoJSONGZExporter(writer)
+		}
+	case ".geojson", ".json":
 		return newGeoJSONGSeqExporter(writer)
 	case ".gpkg":
 		return newGeoPackageExporter(writer)
