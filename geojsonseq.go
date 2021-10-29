@@ -71,7 +71,7 @@ func (p *GeoJSONGSeqProvider) Open(filename string, file io.Reader) error {
 
 func (p *GeoJSONGSeqProvider) Match(filename string, file io.Reader) bool {
 	ext := filepath.Ext(filename)
-	if ext != ".geojson" {
+	if ext != ".geojson" && ext != ".json" {
 		return false
 	}
 	buffer := bufio.NewReader(file)

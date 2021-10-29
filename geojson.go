@@ -28,10 +28,18 @@ func (p *GeoJSONProvider) Open(filename string, file io.Reader) error {
 
 func (p *GeoJSONProvider) Match(filename string, file io.Reader) bool {
 	ext := filepath.Ext(filename)
-	if ext != ".geojson" {
+	if ext != ".geojson" && ext != ".json" {
 		return false
 	}
-	return true
+	data, err := ioutil.ReadAll(file)
+	if err != nil {
+		return false
+	}
+	p.fc, err = general.UnmarshalFeatureCollection(data)
+	if err != nil {
+		return false
+	}
+	return len(p.fc.Features) > 0
 }
 
 func (p *GeoJSONProvider) Reset() error {

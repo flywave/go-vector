@@ -14,8 +14,8 @@ type GeoCSVProvider struct {
 	index   int
 }
 
-func NewGeoCSVProvider(options geocsv.GeoCSVOptions) Provider {
-	return &GeoCSVProvider{csv: nil, options: options, index: 0}
+func NewGeoCSVProvider() Provider {
+	return &GeoCSVProvider{csv: nil, options: geocsv.GeoCSVOptions{XField: "longitude", YField: "latitude", WKTField: "WKT"}, index: 0}
 }
 
 func (p *GeoCSVProvider) Open(filename string, file io.Reader) error {

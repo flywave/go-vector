@@ -2,12 +2,15 @@ package govector
 
 import (
 	"bytes"
-	"compress/gzip"
+	"fmt"
 	"io"
+	"io/ioutil"
+	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
-	_ "github.com/flywave/go-geom"
+	"github.com/mholt/archiver/v3"
 )
 
 var GZ_MAGIC = []byte("\x1f\x8b")
@@ -17,20 +20,40 @@ type GeoJSONGZProvider struct {
 }
 
 func (p *GeoJSONGZProvider) Open(filename string, file io.Reader) error {
-	reader, err := gzip.NewReader(file)
+	ext := filepath.Ext(filename)
+	name := strings.TrimSuffix(path.Base(filename), ext)
+
+	frr, err := ioutil.TempFile(os.TempDir(), fmt.Sprintf("*-%s%s", name, ext))
+
 	if err != nil {
 		return err
 	}
-	ext := filepath.Ext(filename)
-	if ext == ".gz" {
-		filename = strings.TrimSuffix(filename, ".gz")
+
+	defer frr.Close()
+
+	var reader io.Reader
+	var jsonname string
+
+	err = archiver.Walk(frr.Name(), func(file archiver.File) error {
+		jext := filepath.Ext(file.FileInfo.Name())
+
+		if jext == ".json" {
+			jsonname = path.Base(file.FileInfo.Name())
+			reader = file.ReadCloser
+		}
+
+		return nil
+	})
+	if err != nil {
+		return err
 	}
-	return p.GeoJSONProvider.Open(filename, reader)
+
+	return p.GeoJSONProvider.Open(jsonname, reader)
 }
 
 func (p *GeoJSONGZProvider) Match(filename string, file io.Reader) bool {
 	ext := filepath.Ext(filename)
-	if ext != ".gz" || !strings.HasSuffix(filename, ".geojson.gz") {
+	if ext != ".gz" && (!strings.HasSuffix(filename, ".geojson.gz") || !strings.HasSuffix(filename, ".json.gz")) {
 		return false
 	}
 	data := make([]byte, 3)

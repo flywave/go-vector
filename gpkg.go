@@ -21,10 +21,6 @@ type GeoPackageProvider struct {
 	current    *gpkg.GeoPackageReader
 }
 
-func NewGeoPackageProvider() Provider {
-	return &GeoPackageProvider{index: 0, current: nil}
-}
-
 func (p *GeoPackageProvider) Open(filename string, file io.Reader) error {
 	ext := filepath.Ext(filename)
 	name := strings.TrimSuffix(path.Base(filename), ext)

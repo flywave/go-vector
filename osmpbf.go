@@ -99,7 +99,10 @@ func (p *OSMPbfProvider) Match(filename string, file io.Reader) bool {
 	if ext != ".pbf" {
 		return false
 	}
-	return true
+	if strings.HasSuffix(filename, ".osm.pbf") {
+		return true
+	}
+	return false
 }
 
 func (p *OSMPbfProvider) Reset() error {

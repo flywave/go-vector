@@ -69,6 +69,7 @@ func (a *Archiver) writeArchive() (string, error) {
 	}
 
 	name := strings.TrimSuffix(path.Base(a.fileName), a.ext)
+
 	p, err := ioutil.TempFile(os.TempDir(), fmt.Sprintf("*-%s%s", name, a.ext))
 
 	if err != nil {
