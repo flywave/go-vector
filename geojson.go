@@ -1,6 +1,7 @@
 package govector
 
 import (
+	"errors"
 	"io"
 	"io/ioutil"
 	"path/filepath"
@@ -64,4 +65,42 @@ func (p *GeoJSONProvider) Read() *geom.Feature {
 		return nil
 	}
 	return p.fc.Features[p.index]
+}
+
+type GeoJSONExporter struct {
+	cache  *geom.FeatureCollection
+	writer io.WriteCloser
+}
+
+func newGeoJSONExporter(writer io.WriteCloser) Exporter {
+	return &GeoJSONExporter{cache: &geom.FeatureCollection{Features: make([]*geom.Feature, 0, 1024)}, writer: writer}
+}
+
+func (e *GeoJSONExporter) WriteFeature(feature *geom.Feature) error {
+	if e.cache == nil {
+		return errors.New("export not init")
+	}
+	e.cache.Features = append(e.cache.Features, feature)
+	return nil
+}
+
+func (e *GeoJSONExporter) WriteFeatureCollection(feature *geom.FeatureCollection) error {
+	if e.cache == nil {
+		return errors.New("export not init")
+	}
+	e.cache.Features = append(e.cache.Features, feature.Features...)
+	return nil
+}
+
+func (e *GeoJSONExporter) Flush() error {
+	return nil
+}
+
+func (e *GeoJSONExporter) Close() error {
+	json, err := e.cache.MarshalJSON()
+	if err != nil {
+		return err
+	}
+	_, err = e.writer.Write(json)
+	return e.writer.Close()
 }

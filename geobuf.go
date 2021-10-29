@@ -74,3 +74,39 @@ func (p *GeoBufProvider) Read() *geom.Feature {
 	}
 	return p.reader.Feature()
 }
+
+type GeoBufExporter struct {
+	writer *geobuf.Writer
+	out    io.WriteCloser
+}
+
+func newGeoBufExporter(writer io.WriteCloser) Exporter {
+	return &GeoBufExporter{out: writer, writer: geobuf.WriterBufNew()}
+}
+
+func (e *GeoBufExporter) WriteFeature(feature *geom.Feature) error {
+	e.writer.WriteFeature(feature)
+	return nil
+}
+
+func (e *GeoBufExporter) WriteFeatureCollection(feature *geom.FeatureCollection) error {
+	for i := range feature.Features {
+		e.writer.WriteFeature(feature.Features[i])
+	}
+	return nil
+}
+
+func (e *GeoBufExporter) Flush() error {
+	return e.writer.Writer.Flush()
+}
+
+func (e *GeoBufExporter) Close() error {
+	data := e.writer.Bytes()
+	defer e.writer.Close()
+	_, err := e.out.Write(data)
+	defer e.out.Close()
+	if err != nil {
+		return err
+	}
+	return nil
+}

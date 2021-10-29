@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/flywave/go-geom"
 	"github.com/mholt/archiver/v3"
 )
 
@@ -62,4 +63,74 @@ func (p *GeoJSONGZProvider) Match(filename string, file io.Reader) bool {
 		return true
 	}
 	return false
+}
+
+type GeoJSONGZExporter struct {
+	jsonExporter *GeoJSONExporter
+	tempFile     *os.File
+	writer       io.WriteCloser
+}
+
+func newGeoJSONGZExporter(writer io.WriteCloser) Exporter {
+	tempFile, err := ioutil.TempFile(os.TempDir(), "*-export.json")
+	if err != nil {
+		return nil
+	}
+	return &GeoJSONGZExporter{jsonExporter: &GeoJSONExporter{cache: &geom.FeatureCollection{Features: make([]*geom.Feature, 0, 1024)}, writer: writer}, tempFile: tempFile, writer: writer}
+}
+
+func (e *GeoJSONGZExporter) WriteFeature(feature *geom.Feature) error {
+	return e.jsonExporter.WriteFeature(feature)
+}
+
+func (e *GeoJSONGZExporter) WriteFeatureCollection(feature *geom.FeatureCollection) error {
+	return e.jsonExporter.WriteFeatureCollection(feature)
+}
+
+func (e *GeoJSONGZExporter) Flush() error {
+	return e.jsonExporter.Flush()
+}
+
+func (e *GeoJSONGZExporter) Close() error {
+	json, err := e.jsonExporter.cache.MarshalJSON()
+	if err != nil {
+		return err
+	}
+	_, err = e.writer.Write(json)
+	defer func() {
+		os.Remove(e.tempFile.Name())
+		e.tempFile.Close()
+	}()
+
+	if err != nil {
+		return err
+	}
+
+	writer := archiver.NewTarGz()
+
+	defer writer.Close()
+
+	if err := writer.Create(e.writer); err != nil {
+		return err
+	}
+
+	info, err := e.tempFile.Stat()
+
+	if err != nil {
+		return err
+	}
+
+	err = writer.Write(archiver.File{
+		FileInfo: archiver.FileInfo{
+			FileInfo:   info,
+			CustomName: "export.json",
+		},
+		ReadCloser: e.tempFile,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

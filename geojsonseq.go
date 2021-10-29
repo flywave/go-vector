@@ -114,3 +114,41 @@ func (p *GeoJSONGSeqProvider) Read() *geom.Feature {
 	}
 	return feat
 }
+
+type GeoJSONGSeqExporter struct {
+	writer   io.WriteCloser
+	bufwrite *bufio.Writer
+}
+
+func newGeoJSONGSeqExporter(writer io.WriteCloser) Exporter {
+	return &GeoJSONGSeqExporter{writer: writer, bufwrite: bufio.NewWriter(writer)}
+}
+
+func (e *GeoJSONGSeqExporter) WriteFeature(feature *geom.Feature) error {
+	json, err := feature.MarshalJSON()
+	if err != nil {
+		return err
+	}
+	jsonline := append([]byte(json), resourceSep)
+	_, err = e.bufwrite.Write(jsonline)
+	return err
+}
+
+func (e *GeoJSONGSeqExporter) WriteFeatureCollection(feature *geom.FeatureCollection) error {
+	for i := range feature.Features {
+		err := e.WriteFeature(feature.Features[i])
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (e *GeoJSONGSeqExporter) Flush() error {
+	return e.bufwrite.Flush()
+}
+
+func (e *GeoJSONGSeqExporter) Close() error {
+	e.Flush()
+	return e.writer.Close()
+}
