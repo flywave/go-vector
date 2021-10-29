@@ -7,7 +7,7 @@ replace golang.org/x/image => github.com/golang/image v0.0.0-20190703141733-d6a0
 require (
 	github.com/andybalholm/brotli v1.0.3 // indirect
 	github.com/flywave/go-geobuf v0.0.0-20210806074545-36204a4cab4a
-	github.com/flywave/go-geocsv v0.0.0-20211029010109-c398bac6ad05
+	github.com/flywave/go-geocsv v0.0.0-20211029092610-55c608ecacd9
 	github.com/flywave/go-geom v0.0.0-20211028012749-38c3eab20882
 	github.com/flywave/go-gpkg v0.0.0-20211029020113-5771f17ecfc6
 	github.com/flywave/go-mapbox v0.0.0-20211025142134-6903b71f3466 // indirect

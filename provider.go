@@ -30,7 +30,7 @@ func MatchProvider(filename string, file io.Reader) Provider {
 		if p.Match(filename, file) {
 			return p
 		}
-	case ".geojson":
+	case ".geojson", ".json":
 		p := &GeoJSONProvider{}
 		if p.Match(filename, file) {
 			return p
@@ -51,7 +51,7 @@ func MatchProvider(filename string, file io.Reader) Provider {
 			return p
 		}
 	case ".gz":
-		if strings.HasSuffix(filename, ".geojson.gz") {
+		if strings.HasSuffix(filename, ".geojson.gz") || strings.HasSuffix(filename, ".json.gz") {
 			p := &GeoJSONGSeqProvider{}
 			if p.Match(filename, file) {
 				return p

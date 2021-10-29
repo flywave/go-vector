@@ -33,6 +33,8 @@ github.com/flywave/go-geobuf v0.0.0-20210806074545-36204a4cab4a h1:RUUEfTMNNz2xA
 github.com/flywave/go-geobuf v0.0.0-20210806074545-36204a4cab4a/go.mod h1:/pcWHGH0NH9+i3az0bzGDSHpTaf+SdybspR28tYBQjE=
 github.com/flywave/go-geocsv v0.0.0-20211029010109-c398bac6ad05 h1:YN71Mug8+Jtb0kRX+tU3epGSw6jn16L4QB4A21oEVa0=
 github.com/flywave/go-geocsv v0.0.0-20211029010109-c398bac6ad05/go.mod h1:bs95GDwPoV2YNhlhzNauGB8wxrmeYtfg2VVe1xzLp44=
+github.com/flywave/go-geocsv v0.0.0-20211029092610-55c608ecacd9 h1:Jug5A7hp8UAJ/jAUZnxR74kbQtsqHqJ1tqCByEKMaGI=
+github.com/flywave/go-geocsv v0.0.0-20211029092610-55c608ecacd9/go.mod h1:bs95GDwPoV2YNhlhzNauGB8wxrmeYtfg2VVe1xzLp44=
 github.com/flywave/go-geoid v0.0.0-20210705014121-cd8f70cb88bb h1:cfvIpGcu887EYg+ydfMj+hWSHHjxBBu066XK2+rKAQc=
 github.com/flywave/go-geoid v0.0.0-20210705014121-cd8f70cb88bb/go.mod h1:ndXH2J5+CsynPtyL7oihZtN8rRxJ8kpqqwy2DOa86OQ=
 github.com/flywave/go-geom v0.0.0-20210526012220-be9d5453d578/go.mod h1:whIEyVfpaBVcYiDCnnc4IJg5CI5KpLC3quy95YJ1W9I=
