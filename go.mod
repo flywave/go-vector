@@ -12,7 +12,7 @@ require (
 	github.com/flywave/go-gpkg v0.0.0-20211029020113-5771f17ecfc6
 	github.com/flywave/go-mapbox v0.0.0-20211025142134-6903b71f3466 // indirect
 	github.com/flywave/go-osm v0.0.0-20210605063310-3da81a2cc338
-	github.com/flywave/go-shp v0.0.0-20211028064747-14f482f16038
+	github.com/flywave/go-shp v0.0.0-20211126065610-6776988627f5
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/klauspost/pgzip v1.2.5 // indirect

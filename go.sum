@@ -76,6 +76,8 @@ github.com/flywave/go-quantized-mesh v0.0.0-20210525134750-cb854922974d/go.mod h
 github.com/flywave/go-raster v0.0.0-20210526065301-f50e348f662e/go.mod h1:17J4n9odoOX61u0PwtkbIqPkNx5GcAF6xPtQ/4AY6lc=
 github.com/flywave/go-shp v0.0.0-20211028064747-14f482f16038 h1:b2qo15qT1wyMC/2jP/EURHacuPzCyP8z18Hrc0ncA1U=
 github.com/flywave/go-shp v0.0.0-20211028064747-14f482f16038/go.mod h1:5gRzMevYe5IE30W02PoJgauG2Ezd0XC/DonDa3PHSeE=
+github.com/flywave/go-shp v0.0.0-20211126065610-6776988627f5 h1:BIrCXUe2YFRTvnYeBFS2Z9nseaBgQouhDBRK0YWMhTQ=
+github.com/flywave/go-shp v0.0.0-20211126065610-6776988627f5/go.mod h1:5gRzMevYe5IE30W02PoJgauG2Ezd0XC/DonDa3PHSeE=
 github.com/flywave/go-tileproxy v0.0.0-20210913134313-d49d8dbc595b/go.mod h1:8bO7MNq2EWLjo7cG16q01oaI9VH89yLfZmiceCKIPkk=
 github.com/flywave/go-tin v0.0.0-20210709095840-eb32125581f8/go.mod h1:OFGBbky1hGhO30xl0I6IbUVdOPvjwo9qfi7zcH8fivo=
 github.com/flywave/go-xslt v0.0.0-20210730032627-a21173f9ee67/go.mod h1:tADSmg0//jibF4kAQCkw36d4w5sUKQB5N4nnBpUxy3I=

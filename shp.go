@@ -169,9 +169,9 @@ func (p *ShapeProvider) Next() bool {
 	if p.current != nil {
 		if p.current.next() {
 			return true
-		} else {
-			return p.moveNext()
 		}
+	} else {
+		return p.moveNext()
 	}
 	return false
 }
