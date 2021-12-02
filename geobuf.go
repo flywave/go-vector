@@ -42,7 +42,7 @@ func (p *GeoBufProvider) Match(filename string, file io.Reader) bool {
 		}
 		reader = geobuf.ReaderBuf(data)
 	}
-	if reader.MetaDataBool {
+	if reader.Next() {
 		return true
 	}
 	return false

@@ -9,16 +9,18 @@ import (
 )
 
 func TestGeoBufProvider(t *testing.T) {
-	reader, err := os.Open("./testdata/5_22_11.geobuf")
+
+	reader, err := os.Open("./testdata/data.geobuf")
 	if err != nil {
 		t.FailNow()
 	}
-	provider := MatchProvider("./testdata/5_22_11.geobuf", reader)
+	provider := MatchProvider("./testdata/data.geobuf", reader)
 	if provider == nil {
 		t.FailNow()
 	}
+	reader.Seek(0, io.SeekStart)
 
-	err = provider.Open("./testdata/5_22_11.geobuf", reader)
+	err = provider.Open("./testdata/data.geobuf", reader)
 	if err != nil {
 		t.FailNow()
 	}
