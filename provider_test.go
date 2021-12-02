@@ -1,6 +1,7 @@
 package govector
 
 import (
+	"io"
 	"os"
 	"testing"
 
@@ -45,6 +46,8 @@ func TestGeoCSVProvider(t *testing.T) {
 		t.FailNow()
 	}
 
+	reader.Seek(0, io.SeekStart)
+
 	err = provider.Open("./testdata/ne_110m_populated_places_simple.csv", reader)
 	if err != nil {
 		t.FailNow()
@@ -72,6 +75,7 @@ func TestGeoJsonGzProvider(t *testing.T) {
 	if provider == nil {
 		t.FailNow()
 	}
+	reader.Seek(0, io.SeekStart)
 
 	err = provider.Open("./testdata/in.json.gz", reader)
 	if err != nil {
@@ -100,6 +104,7 @@ func TestGeoJsonSeqProvider(t *testing.T) {
 	if provider == nil {
 		t.FailNow()
 	}
+	reader.Seek(0, io.SeekStart)
 
 	err = provider.Open("./testdata/sherlock.json", reader)
 	if err != nil {
@@ -128,6 +133,7 @@ func TestGPKGProvider(t *testing.T) {
 	if provider == nil {
 		t.FailNow()
 	}
+	reader.Seek(0, io.SeekStart)
 
 	err = provider.Open("./testdata/natural_earth_minimal.gpkg", reader)
 	if err != nil {
@@ -156,7 +162,7 @@ func TestOSMPBFProvider(t *testing.T) {
 	if provider == nil {
 		t.FailNow()
 	}
-
+	reader.Seek(0, io.SeekStart)
 	err = provider.Open("./testdata/sample.osm.pbf", reader)
 	if err != nil {
 		t.FailNow()
@@ -184,6 +190,7 @@ func TestSHPProvider(t *testing.T) {
 	if provider == nil {
 		t.FailNow()
 	}
+	reader.Seek(0, io.SeekStart)
 
 	err = provider.Open("./testdata/shp.tar.gz", reader)
 	if err != nil {

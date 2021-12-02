@@ -17,7 +17,7 @@ type Provider interface {
 	Read() *geom.Feature
 }
 
-func MatchProvider(filename string, file io.Reader) Provider {
+func MatchProvider(filename string, file io.ReadSeeker) Provider {
 	ext := filepath.Ext(filename)
 	switch ext {
 	case ".geobuf":
@@ -30,11 +30,22 @@ func MatchProvider(filename string, file io.Reader) Provider {
 		if p.Match(filename, file) {
 			return p
 		}
-	case ".geojson", ".json":
+	case ".geojson":
 		p := &GeoJSONProvider{}
 		if p.Match(filename, file) {
 			return p
 		} else {
+			p2 := &GeoJSONGSeqProvider{}
+			if p2.Match(filename, file) {
+				return p2
+			}
+		}
+	case ".json":
+		p := &GeoJSONProvider{}
+		if p.Match(filename, file) {
+			return p
+		} else {
+			file.Seek(0, io.SeekStart)
 			p2 := &GeoJSONGSeqProvider{}
 			if p2.Match(filename, file) {
 				return p2
@@ -52,7 +63,7 @@ func MatchProvider(filename string, file io.Reader) Provider {
 		}
 	case ".gz":
 		if strings.HasSuffix(filename, ".geojson.gz") || strings.HasSuffix(filename, ".json.gz") {
-			p := &GeoJSONGSeqProvider{}
+			p := &GeoJSONGZProvider{}
 			if p.Match(filename, file) {
 				return p
 			}

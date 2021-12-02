@@ -3,6 +3,8 @@ package govector
 import (
 	"errors"
 	"io"
+	"io/ioutil"
+	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -50,7 +52,6 @@ func (p *shapeIterator) Close() error {
 type ShapeProvider struct {
 	archiver *Archiver
 	shpfiles []string
-	workDir  string
 	index    int
 	current  *shapeIterator
 }
@@ -69,11 +70,23 @@ func (p *ShapeProvider) Open(filename string, file io.Reader) error {
 
 	shpfiles := make(map[string]string)
 
+	dir, _ := ioutil.TempDir(os.TempDir(), "")
+
 	arch.Walk(func(filename string, f io.ReadCloser, size int64) error {
 		ext := filepath.Ext(filename)
-		if ext == SHAPE_SHP_EXT {
-			shpfiles[filename] = filename
+		tempFile, err := os.Create(path.Join(dir, filename))
+		if err != nil {
+			return nil
 		}
+
+		io.Copy(tempFile, f)
+
+		if ext == SHAPE_SHP_EXT {
+			shpfiles[filename] = tempFile.Name()
+		}
+
+		tempFile.Sync()
+		tempFile.Close()
 		return nil
 	})
 
@@ -145,7 +158,12 @@ func (p *ShapeProvider) Close() error {
 	if p.current != nil {
 		p.current.Close()
 	}
-	return p.archiver.Close()
+	p.archiver.Close()
+
+	for i := range p.shpfiles {
+		os.ReadFile(p.shpfiles[i])
+	}
+	return nil
 }
 
 func (p *ShapeProvider) moveNext() bool {
@@ -155,7 +173,6 @@ func (p *ShapeProvider) moveNext() bool {
 	if p.index < len(p.shpfiles)-1 {
 		p.index++
 		filename := p.shpfiles[p.index]
-		filename = path.Join(p.workDir, filename)
 		if p.current != nil {
 			p.current.Close()
 		}
@@ -169,6 +186,8 @@ func (p *ShapeProvider) Next() bool {
 	if p.current != nil {
 		if p.current.next() {
 			return true
+		} else {
+			return p.moveNext()
 		}
 	} else {
 		return p.moveNext()
