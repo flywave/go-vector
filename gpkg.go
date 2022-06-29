@@ -23,6 +23,7 @@ type GeoPackageProvider struct {
 }
 
 func (p *GeoPackageProvider) Open(filename string, file io.Reader) error {
+	p.index = -1
 	ext := filepath.Ext(filename)
 	name := strings.TrimSuffix(path.Base(filename), ext)
 
@@ -91,7 +92,7 @@ func (p *GeoPackageProvider) Reset() error {
 	if p.current != nil {
 		p.current = nil
 	}
-	p.index = 0
+	p.index = -1
 	return nil
 }
 
@@ -112,7 +113,7 @@ func (p *GeoPackageProvider) Next() bool {
 	}
 	if p.current.Next() {
 		return true
-	} else if p.index < len(p.layers)-1 {
+	} else if p.index < len(p.layers) {
 		p.index++
 		l := p.layers[p.index]
 		var err error

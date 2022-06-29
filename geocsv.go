@@ -19,6 +19,7 @@ func NewGeoCSVProvider() Provider {
 }
 
 func (p *GeoCSVProvider) Open(filename string, file io.Reader) error {
+	p.index = -1
 	var err error
 	p.csv, err = geocsv.Read(file, p.options)
 	if err != nil {
@@ -40,7 +41,7 @@ func (p *GeoCSVProvider) Match(filename string, file io.Reader) bool {
 }
 
 func (p *GeoCSVProvider) Reset() error {
-	p.index = 0
+	p.index = -1
 	return nil
 }
 

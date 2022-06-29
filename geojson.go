@@ -16,6 +16,7 @@ type GeoJSONProvider struct {
 }
 
 func (p *GeoJSONProvider) Open(filename string, file io.Reader) error {
+	p.index = -1
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
 		return err
@@ -44,7 +45,7 @@ func (p *GeoJSONProvider) Match(filename string, file io.Reader) bool {
 }
 
 func (p *GeoJSONProvider) Reset() error {
-	p.index = 0
+	p.index = -1
 	return nil
 }
 
