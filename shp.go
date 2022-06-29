@@ -61,7 +61,7 @@ func (p *ShapeProvider) ShapeFiles() []string {
 }
 
 func (p *ShapeProvider) Open(filename string, file io.Reader) error {
-	p.index = -1
+
 	arch := NewArchiver(filename, file)
 
 	if err := arch.Valid(); err != nil {
@@ -145,7 +145,6 @@ func (p *ShapeProvider) Match(filename string, file io.Reader) bool {
 }
 
 func (p *ShapeProvider) Reset() error {
-	p.index = -1
 	if p.current != nil {
 		p.current.Close()
 	}
@@ -173,12 +172,12 @@ func (p *ShapeProvider) moveNext() bool {
 		return false
 	}
 	if p.index < len(p.shpfiles) {
-		p.index++
 		filename := p.shpfiles[p.index]
 		if p.current != nil {
 			p.current.Close()
 		}
 		p.current = newIterator(filename)
+		p.index++
 		return true
 	}
 	return false

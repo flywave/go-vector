@@ -19,7 +19,6 @@ func NewGeoCSVProvider() Provider {
 }
 
 func (p *GeoCSVProvider) Open(filename string, file io.Reader) error {
-	p.index = -1
 	var err error
 	p.csv, err = geocsv.Read(file, p.options)
 	if err != nil {
@@ -41,7 +40,7 @@ func (p *GeoCSVProvider) Match(filename string, file io.Reader) bool {
 }
 
 func (p *GeoCSVProvider) Reset() error {
-	p.index = -1
+	p.index = 0
 	return nil
 }
 
@@ -61,5 +60,5 @@ func (p *GeoCSVProvider) Read() *geom.Feature {
 	if p.csv == nil {
 		return nil
 	}
-	return p.csv.Feature(p.index)
+	return p.csv.Feature(p.index - 1)
 }
