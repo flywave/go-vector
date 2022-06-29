@@ -53,7 +53,7 @@ func (p *GeoJSONProvider) Close() error {
 }
 
 func (p *GeoJSONProvider) Next() bool {
-	if p.index < (len(p.fc.Features) - 1) {
+	if p.index < (len(p.fc.Features)) {
 		p.index++
 		return true
 	}

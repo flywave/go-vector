@@ -49,7 +49,7 @@ func (p *GeoCSVProvider) Close() error {
 }
 
 func (p *GeoCSVProvider) Next() bool {
-	if p.index < (p.csv.RowCount() - 1) {
+	if p.index < (p.csv.RowCount()) {
 		p.index++
 		return true
 	}

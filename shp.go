@@ -30,7 +30,7 @@ func (p *shapeIterator) next() bool {
 	if p.file == nil || p.file.ShapeCount == 0 {
 		return false
 	}
-	if p.currentFeat < (p.file.ShapeCount - 1) {
+	if p.currentFeat < (p.file.ShapeCount) {
 		p.currentFeat++
 		return true
 	}
