@@ -24,30 +24,23 @@ func (p *GeoJSONGZProvider) Open(filename string, file io.Reader) error {
 	ext := filepath.Ext(filename)
 	name := strings.TrimSuffix(path.Base(filename), ext)
 
-	frr, err := ioutil.TempFile(os.TempDir(), fmt.Sprintf("*-%s%s", name, ext))
+	reader, err := ioutil.TempFile(os.TempDir(), fmt.Sprintf("*-%s%s", name, ext))
 
 	if err != nil {
 		return err
 	}
 
-	defer frr.Close()
+	gz := archiver.NewGz()
 
-	var reader io.Reader
-	var jsonname string
+	gz.Decompress(file, reader)
 
-	err = archiver.Walk(frr.Name(), func(file archiver.File) error {
-		jext := filepath.Ext(file.FileInfo.Name())
+	reader.Sync()
 
-		if jext == ".json" {
-			jsonname = path.Base(file.FileInfo.Name())
-			reader = file.ReadCloser
-		}
+	reader.Seek(0, io.SeekStart)
 
-		return nil
-	})
-	if err != nil {
-		return err
-	}
+	defer reader.Close()
+
+	jsonname := "in.json"
 
 	return p.GeoJSONProvider.Open(jsonname, reader)
 }

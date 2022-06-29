@@ -32,12 +32,15 @@ func (ch *chunk) next() bool {
 		return false
 	}
 	var err error
-	ch.buf, err = ch.reader.ReadBytes(resourceSep)
+	ch.buf, _, err = ch.reader.ReadLine()
 	if err == io.EOF {
 		ch.endReached = true
 	} else if err != nil {
 		ch.err = err
 		return true
+	}
+	if ch.buf == nil {
+		return false
 	}
 	ch.buf = ch.buf[:len(ch.buf)-1]
 	return true
@@ -74,14 +77,13 @@ func (p *GeoJSONGSeqProvider) Match(filename string, file io.Reader) bool {
 	if ext != ".geojson" && ext != ".json" {
 		return false
 	}
+
 	buffer := bufio.NewReader(file)
 
-	buf, err := buffer.ReadBytes(resourceSep)
-	if err != nil {
-		return false
-	}
+	buf, _, _ := buffer.ReadLine()
+
 	var fts []*geom.Feature
-	err = json.Unmarshal(append(append([]byte(`[`), buf...), ']'), &fts)
+	err := json.Unmarshal(append(append([]byte(`[`), buf...), ']'), &fts)
 	if err != nil {
 		return false
 	}

@@ -32,6 +32,8 @@ func (p *GeoPackageProvider) Open(filename string, file io.Reader) error {
 		return err
 	}
 
+	io.Copy(tempGpkg, file)
+
 	dbFileName := tempGpkg.Name()
 
 	tempGpkg.Sync()
@@ -63,6 +65,8 @@ func (p *GeoPackageProvider) Match(filename string, file io.Reader) bool {
 	if err != nil {
 		return false
 	}
+
+	io.Copy(tempGpkg, file)
 
 	dbFileName := tempGpkg.Name()
 
