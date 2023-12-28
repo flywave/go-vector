@@ -80,8 +80,6 @@ github.com/flywave/go-proj v0.0.0-20210916052607-87a91fe342a8/go.mod h1:RX83BRZN
 github.com/flywave/go-quantized-mesh v0.0.0-20210525134750-cb854922974d h1:VkVUU6hMDO/y1n1du6sLUTswo8bTo4FNSOS0kA+F4e0=
 github.com/flywave/go-quantized-mesh v0.0.0-20210525134750-cb854922974d/go.mod h1:/OSV1sGRbJezuTheaHH6X2Xf/G7MVaOBeHIGQtGpj+0=
 github.com/flywave/go-raster v0.0.0-20210526065301-f50e348f662e/go.mod h1:17J4n9odoOX61u0PwtkbIqPkNx5GcAF6xPtQ/4AY6lc=
-github.com/flywave/go-shp v0.0.0-20211028064747-14f482f16038 h1:b2qo15qT1wyMC/2jP/EURHacuPzCyP8z18Hrc0ncA1U=
-github.com/flywave/go-shp v0.0.0-20211028064747-14f482f16038/go.mod h1:5gRzMevYe5IE30W02PoJgauG2Ezd0XC/DonDa3PHSeE=
 github.com/flywave/go-shp v0.0.0-20211126065610-6776988627f5 h1:BIrCXUe2YFRTvnYeBFS2Z9nseaBgQouhDBRK0YWMhTQ=
 github.com/flywave/go-shp v0.0.0-20211126065610-6776988627f5/go.mod h1:5gRzMevYe5IE30W02PoJgauG2Ezd0XC/DonDa3PHSeE=
 github.com/flywave/go-tileproxy v0.0.0-20210913134313-d49d8dbc595b/go.mod h1:8bO7MNq2EWLjo7cG16q01oaI9VH89yLfZmiceCKIPkk=
