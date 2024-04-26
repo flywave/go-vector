@@ -11,7 +11,7 @@ require (
 	github.com/flywave/go-geom v0.0.0-20240413053440-2a92254acc0d
 	github.com/flywave/go-gpkg v0.0.0-20220505053116-3682bbf4ea48
 	github.com/flywave/go-osm v0.0.0-20211202085321-9af62ba7eeaa
-	github.com/flywave/go-shp v0.1.2
+	github.com/flywave/go-shp v0.1.3
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/klauspost/pgzip v1.2.5 // indirect
