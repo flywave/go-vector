@@ -2,8 +2,10 @@ package govector
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/flywave/go-geobuf"
@@ -11,19 +13,35 @@ import (
 )
 
 type GeoBufProvider struct {
-	reader *geobuf.Reader
+	reader   *geobuf.Reader
+	filename string
+}
+
+func (p *GeoBufProvider) tempFileFromReader(file io.Reader) (string, error) {
+	tmp, err := ioutil.TempFile(os.TempDir(), "*-geobuf")
+	if err != nil {
+		return "", err
+	}
+	defer tmp.Close()
+	if _, err := io.Copy(tmp, file); err != nil {
+		os.Remove(tmp.Name())
+		return "", err
+	}
+	return tmp.Name(), nil
 }
 
 func (p *GeoBufProvider) Open(filename string, file io.Reader) error {
 	if FileExists(filename) {
+		p.filename = filename
 		p.reader = geobuf.ReaderFile(filename)
-	} else {
-		data, err := ioutil.ReadAll(file)
-		if err != nil {
-			return err
-		}
-		p.reader = geobuf.ReaderBuf(data)
+		return nil
 	}
+	name, err := p.tempFileFromReader(file)
+	if err != nil {
+		return err
+	}
+	p.filename = name
+	p.reader = geobuf.ReaderFile(name)
 	return nil
 }
 
@@ -32,24 +50,37 @@ func (p *GeoBufProvider) Match(filename string, file io.Reader) bool {
 	if ext != ".geobuf" {
 		return false
 	}
-	var reader *geobuf.Reader
 	if FileExists(filename) {
-		reader = geobuf.ReaderFile(filename)
-	} else {
-		data, err := ioutil.ReadAll(file)
-		if err != nil {
-			return false
+		r := geobuf.ReaderFile(filename)
+		if r.Next() {
+			r.Close()
+			return true
 		}
-		reader = geobuf.ReaderBuf(data)
+		r.Close()
+		return false
 	}
-	if reader.Next() {
+	tmp, err := p.tempFileFromReader(file)
+	if err != nil {
+		return false
+	}
+	defer os.Remove(tmp)
+	r := geobuf.ReaderFile(tmp)
+	if r.Next() {
+		r.Close()
 		return true
 	}
+	r.Close()
 	return false
 }
 
 func (p *GeoBufProvider) Close() error {
-	p.reader.Close()
+	if p.reader != nil {
+		p.reader.Close()
+	}
+	if p.filename != "" && !FileExists(p.filename) {
+		// temp file was created from reader
+		os.Remove(p.filename)
+	}
 	return nil
 }
 
@@ -76,12 +107,25 @@ func (p *GeoBufProvider) Read() *geom.Feature {
 }
 
 type GeoBufExporter struct {
-	writer *geobuf.Writer
-	out    io.WriteCloser
+	out      io.WriteCloser
+	filename string
+	writer   *geobuf.Writer
 }
 
 func newGeoBufExporter(writer io.WriteCloser) Exporter {
-	return &GeoBufExporter{out: writer, writer: geobuf.WriterBufNew()}
+	tmp, err := ioutil.TempFile(os.TempDir(), "*-export.geobuf")
+	if err != nil {
+		return nil
+	}
+	name := tmp.Name()
+	tmp.Close()
+
+	w := geobuf.WriterFile(name)
+	return &GeoBufExporter{
+		out:      writer,
+		filename: name,
+		writer:   w,
+	}
 }
 
 func (e *GeoBufExporter) WriteFeature(feature *geom.Feature) error {
@@ -97,16 +141,27 @@ func (e *GeoBufExporter) WriteFeatureCollection(feature *geom.FeatureCollection)
 }
 
 func (e *GeoBufExporter) Flush() error {
-	return e.writer.Writer.Flush()
+	return fmt.Errorf("Flush not supported for file-backed GeoBuf exporter")
 }
 
 func (e *GeoBufExporter) Close() error {
-	data := e.writer.Bytes()
-	defer e.writer.Close()
-	_, err := e.out.Write(data)
 	defer e.out.Close()
+	defer os.Remove(e.filename)
+
+	e.writer.Close()
+
+	f, err := os.Open(e.filename)
 	if err != nil {
 		return err
 	}
-	return nil
+	defer f.Close()
+
+	_, err = io.Copy(e.out, f)
+	return err
+}
+
+func (e *GeoBufExporter) Bytes() ([]byte, error) {
+	e.writer.Close()
+	defer os.Remove(e.filename)
+	return ioutil.ReadFile(e.filename)
 }

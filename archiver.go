@@ -76,6 +76,10 @@ func (a *Archiver) writeArchive() (string, error) {
 		return "", err
 	}
 
+	if a.file != nil {
+		io.Copy(p, a.file)
+	}
+
 	defer p.Close()
 
 	a.archive = p.Name()

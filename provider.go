@@ -35,6 +35,7 @@ func MatchProvider(filename string, file io.ReadSeeker) Provider {
 		if p.Match(filename, file) {
 			return p
 		} else {
+			file.Seek(0, io.SeekStart)
 			p2 := &GeoJSONGSeqProvider{}
 			if p2.Match(filename, file) {
 				return p2

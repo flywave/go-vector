@@ -1,6 +1,7 @@
 package govector
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -52,38 +53,47 @@ func (p *GeoPackageProvider) Open(filename string, file io.Reader) error {
 	return nil
 }
 
+var gpkgMagic = []byte("SQLite format 3\x00")
+
 func (p *GeoPackageProvider) Match(filename string, file io.Reader) bool {
 	ext := filepath.Ext(filename)
 	if ext != ".gpkg" {
 		return false
 	}
 
-	name := strings.TrimSuffix(path.Base(filename), ext)
-
-	tempGpkg, err := ioutil.TempFile(os.TempDir(), fmt.Sprintf("*-%s%s", path.Base(name), ext))
-
-	if err != nil {
+	// Quick check: GPKG is SQLite, must start with magic header
+	buf := make([]byte, 16)
+	if _, err := io.ReadFull(file, buf); err != nil {
+		return false
+	}
+	if !bytes.HasPrefix(buf, gpkgMagic) {
 		return false
 	}
 
+	// For full validation, copy to temp and check layers
+	return p.matchFull(filename, io.MultiReader(bytes.NewReader(buf), file))
+}
+
+func (p *GeoPackageProvider) matchFull(filename string, file io.Reader) bool {
+	name := strings.TrimSuffix(path.Base(filename), filepath.Ext(filename))
+	ext := filepath.Ext(filename)
+
+	tempGpkg, err := ioutil.TempFile(os.TempDir(), fmt.Sprintf("*-%s%s", path.Base(name), ext))
+	if err != nil {
+		return false
+	}
+	defer os.Remove(tempGpkg.Name())
+
 	io.Copy(tempGpkg, file)
-
-	dbFileName := tempGpkg.Name()
-
 	tempGpkg.Sync()
 	tempGpkg.Close()
 
-	defer os.Remove(dbFileName)
-
-	db := gpkg.New(dbFileName)
+	db := gpkg.New(tempGpkg.Name())
 	db.Init()
-
 	layers, err := db.GetVectorLayers()
-
 	if err != nil {
 		return false
 	}
-
 	return len(layers) > 0
 }
 
@@ -102,28 +112,24 @@ func (p *GeoPackageProvider) Close() error {
 }
 
 func (p *GeoPackageProvider) Next() bool {
-	if p.current == nil && p.index == 0 {
-		l := p.layers[p.index]
-		var err error
-		p.current, err = p.db.GetFeatureReader(l.Name)
-		if err != nil {
-			return false
+	for {
+		if p.current == nil {
+			if p.index >= len(p.layers) {
+				return false
+			}
+			l := p.layers[p.index]
+			var err error
+			p.current, err = p.db.GetFeatureReader(l.Name)
+			if err != nil {
+				return false
+			}
 		}
-	}
-	if p.current.Next() {
-		return true
-	} else if p.index < len(p.layers) {
+		if p.current.Next() {
+			return true
+		}
+		p.current = nil
 		p.index++
-		l := p.layers[p.index]
-		var err error
-		p.current, err = p.db.GetFeatureReader(l.Name)
-		if err != nil {
-			return false
-		}
-		return p.current.Next()
 	}
-
-	return false
 }
 
 func (p *GeoPackageProvider) Read() *geom.Feature {
@@ -138,12 +144,14 @@ func (p *GeoPackageProvider) Read() *geom.Feature {
 }
 
 const EXPORT_TABLE_NAME = "export"
+const EXPORT_FLUSH_BATCH = 500
 
 type GeoPackageExporter struct {
-	dbFileName string
-	db         *gpkg.GeoPackage
-	writer     io.WriteCloser
-	cache      *geom.FeatureCollection
+	dbFileName    string
+	db            *gpkg.GeoPackage
+	writer        io.WriteCloser
+	batch         []*geom.Feature
+	tableReady    bool
 }
 
 func newGeoPackageExporter(writer io.WriteCloser) Exporter {
@@ -157,46 +165,65 @@ func newGeoPackageExporter(writer io.WriteCloser) Exporter {
 
 	tempGpkg.Close()
 
-	return &GeoPackageExporter{writer: writer, db: gpkg.Create(dbFileName), dbFileName: dbFileName, cache: &geom.FeatureCollection{Features: make([]*geom.Feature, 0, 1024)}}
+	return &GeoPackageExporter{
+		writer:     writer,
+		db:         gpkg.Create(dbFileName),
+		dbFileName: dbFileName,
+		batch:      make([]*geom.Feature, 0, EXPORT_FLUSH_BATCH),
+	}
+}
+
+func (e *GeoPackageExporter) flushBatch() error {
+	if len(e.batch) == 0 {
+		return nil
+	}
+	fc := &geom.FeatureCollection{Features: e.batch}
+	if err := e.db.StoreFeatureCollection(EXPORT_TABLE_NAME, fc); err != nil {
+		return err
+	}
+	e.batch = e.batch[:0]
+	e.tableReady = true
+	return nil
 }
 
 func (e *GeoPackageExporter) WriteFeature(feature *geom.Feature) error {
-	if e.cache == nil {
+	if e.batch == nil {
 		return errors.New("export not init")
 	}
-	if e.cache != nil {
-		e.cache.Features = append(e.cache.Features, feature)
+	e.batch = append(e.batch, feature)
+	if len(e.batch) >= EXPORT_FLUSH_BATCH {
+		return e.flushBatch()
 	}
 	return nil
 }
 
 func (e *GeoPackageExporter) WriteFeatureCollection(feature *geom.FeatureCollection) error {
-	if e.cache == nil {
-		return errors.New("export not init")
+	for _, f := range feature.Features {
+		if err := e.WriteFeature(f); err != nil {
+			return err
+		}
 	}
-	e.cache.Features = append(e.cache.Features, feature.Features...)
 	return nil
 }
 
 func (e *GeoPackageExporter) Flush() error {
-	return nil
+	return e.flushBatch()
 }
 
 func (e *GeoPackageExporter) Close() error {
 	defer e.writer.Close()
 	defer os.Remove(e.dbFileName)
-	err := e.db.StoreFeatureCollection(EXPORT_TABLE_NAME, e.cache)
-	if err != nil {
+
+	if err := e.flushBatch(); err != nil {
 		return err
 	}
+
 	e.db.Close()
 	f, err := os.Open(e.dbFileName)
 	if err != nil {
 		return err
 	}
+	defer f.Close()
 	_, err = io.Copy(e.writer, f)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }

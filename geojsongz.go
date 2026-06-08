@@ -2,6 +2,7 @@ package govector
 
 import (
 	"bytes"
+	"compress/gzip"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -17,7 +18,7 @@ import (
 var GZ_MAGIC = []byte("\x1f\x8b")
 
 type GeoJSONGZProvider struct {
-	GeoJSONProvider
+	GeoJSONGSeqProvider
 }
 
 func (p *GeoJSONGZProvider) Open(filename string, file io.Reader) error {
@@ -42,24 +43,23 @@ func (p *GeoJSONGZProvider) Open(filename string, file io.Reader) error {
 
 	jsonname := "in.json"
 
-	return p.GeoJSONProvider.Open(jsonname, reader)
+	return p.GeoJSONGSeqProvider.Open(jsonname, reader)
 }
 
 func (p *GeoJSONGZProvider) Match(filename string, file io.Reader) bool {
-	ext := filepath.Ext(filename)
-	if ext != ".gz" && (!strings.HasSuffix(filename, ".geojson.gz") || !strings.HasSuffix(filename, ".json.gz")) {
+	if !strings.HasSuffix(filename, ".geojson.gz") && !strings.HasSuffix(filename, ".json.gz") {
 		return false
 	}
 	data := make([]byte, 3)
-	file.Read(data)
-	if bytes.HasPrefix(data, GZ_MAGIC) {
-		return true
+	n, _ := file.Read(data)
+	if n < 3 {
+		return false
 	}
-	return false
+	return bytes.HasPrefix(data, GZ_MAGIC)
 }
 
 type GeoJSONGZExporter struct {
-	jsonExporter *GeoJSONExporter
+	jsonExporter *GeoJSONGSeqExporter
 	tempFile     *os.File
 	writer       io.WriteCloser
 }
@@ -69,7 +69,11 @@ func newGeoJSONGZExporter(writer io.WriteCloser) Exporter {
 	if err != nil {
 		return nil
 	}
-	return &GeoJSONGZExporter{jsonExporter: &GeoJSONExporter{cache: &geom.FeatureCollection{Features: make([]*geom.Feature, 0, 1024)}, writer: writer}, tempFile: tempFile, writer: writer}
+	return &GeoJSONGZExporter{
+		jsonExporter: newGeoJSONGSeqExporter(tempFile).(*GeoJSONGSeqExporter),
+		tempFile:     tempFile,
+		writer:       writer,
+	}
 }
 
 func (e *GeoJSONGZExporter) WriteFeature(feature *geom.Feature) error {
@@ -85,45 +89,22 @@ func (e *GeoJSONGZExporter) Flush() error {
 }
 
 func (e *GeoJSONGZExporter) Close() error {
-	json, err := e.jsonExporter.cache.MarshalJSON()
-	if err != nil {
-		return err
-	}
-	_, err = e.writer.Write(json)
+	defer e.writer.Close()
 	defer func() {
-		os.Remove(e.tempFile.Name())
 		e.tempFile.Close()
+		os.Remove(e.tempFile.Name())
 	}()
 
+	err := e.jsonExporter.Close()
 	if err != nil {
 		return err
 	}
 
-	writer := archiver.NewTarGz()
+	e.tempFile.Seek(0, io.SeekStart)
 
-	defer writer.Close()
+	gzWriter := gzip.NewWriter(e.writer)
+	defer gzWriter.Close()
 
-	if err := writer.Create(e.writer); err != nil {
-		return err
-	}
-
-	info, err := e.tempFile.Stat()
-
-	if err != nil {
-		return err
-	}
-
-	err = writer.Write(archiver.File{
-		FileInfo: archiver.FileInfo{
-			FileInfo:   info,
-			CustomName: "export.json",
-		},
-		ReadCloser: e.tempFile,
-	})
-
-	if err != nil {
-		return err
-	}
-
-	return nil
+	_, err = io.Copy(gzWriter, e.tempFile)
+	return err
 }

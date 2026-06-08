@@ -71,9 +71,12 @@ func (p *ShapeProvider) Open(filename string, file io.Reader) error {
 
 	shpfiles := make(map[string]string)
 
-	dir, _ := ioutil.TempDir(os.TempDir(), "")
+	dir, err := ioutil.TempDir(os.TempDir(), "")
+	if err != nil {
+		return err
+	}
 
-	arch.Walk(func(filename string, f io.ReadCloser, size int64) error {
+	err = arch.Walk(func(filename string, f io.ReadCloser, size int64) error {
 		ext := filepath.Ext(filename)
 		tempFile, err := os.Create(path.Join(dir, filename))
 		if err != nil {
@@ -90,6 +93,9 @@ func (p *ShapeProvider) Open(filename string, file io.Reader) error {
 		tempFile.Close()
 		return nil
 	})
+	if err != nil {
+		return err
+	}
 
 	for _, f := range shpfiles {
 		p.shpfiles = append(p.shpfiles, f)
@@ -162,7 +168,7 @@ func (p *ShapeProvider) Close() error {
 	p.archiver.Close()
 
 	for i := range p.shpfiles {
-		os.ReadFile(p.shpfiles[i])
+		os.Remove(p.shpfiles[i])
 	}
 	return nil
 }
