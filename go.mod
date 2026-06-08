@@ -8,6 +8,8 @@ replace golang.org/x/image => github.com/golang/image v0.0.0-20190703141733-d6a0
 
 replace github.com/flywave/go-geobuf => ../go-geobuf
 
+replace github.com/flywave/go-osm => ../go-osm
+
 require (
 	github.com/flywave/go-geobuf v0.0.0-20210806074545-36204a4cab4a
 	github.com/flywave/go-geocsv v0.0.0-20211202085336-afc074910ef4
